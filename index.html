@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NIDS Dashboard</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            margin-top: 50px;
+        }
+
+        .card {
+            margin-bottom: 20px;
+        }
+
+        .table thead {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .table tbody tr:nth-child(odd) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">Network Intrusion Detection System Dashboard</h1>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        Recent Network Activity
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped" id="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Source IP</th>
+                                    <th>Destination IP</th>
+                                    <th>Protocol</th>
+                                    <th>Packet Size</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-danger text-white">
+                        Recent Alerts
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped" id="alerts-table">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Anomaly Score</th>
+                                    <th>Malware Score</th>
+                                    <th>Type</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        function fetchData() {
+            $.getJSON('/api/data', function (data) {
+                var rows = '';
+                $.each(data, function (index, item) {
+                    rows += '<tr>';
+                    rows += '<td>' + item.timestamp + '</td>';
+                    rows += '<td>' + item.source_ip + '</td>';
+                    rows += '<td>' + item.destination_ip + '</td>';
+                    rows += '<td>' + item.protocol + '</td>';
+                    rows += '<td>' + item.packet_size + '</td>';
+                    rows += '</tr>';
+                });
+                $('#data-table tbody').html(rows);
+            });
+        }
+
+        function fetchAlerts() {
+            $.getJSON('/api/alerts', function (alerts) {
+                var rows = '';
+                $.each(alerts, function (index, alert) {
+                    rows += '<tr>';
+                    rows += '<td>' + alert.timestamp + '</td>';
+                    rows += '<td>' + alert.anomaly_score + '</td>';
+                    rows += '<td>' + alert.malware_score + '</td>';
+                    rows += '<td>' + (alert.is_anomaly ? 'Anomaly' : 'Malware') + '</td>';
+                    rows += '</tr>';
+                });
+                $('#alerts-table tbody').html(rows);
+            });
+        }
+
+        $(document).ready(function () {
+            fetchData();
+            fetchAlerts();
+            setInterval(fetchData, 5000);
+            setInterval(fetchAlerts, 5000);
+        });
+    </script>
+</body>
+
+</html>
