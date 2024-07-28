@@ -6,8 +6,6 @@ from models import anomaly_model, malware_model
 import sqlite3
 from collections import defaultdict, deque
 import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 
 # Database setup
 conn = sqlite3.connect('network_traffic.db')
